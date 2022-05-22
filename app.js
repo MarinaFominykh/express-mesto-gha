@@ -17,14 +17,14 @@ const cardRouter = require('./routes/cards');
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '',
+    _id: '628a635b0f7e1d765f695c0e',
   };
 
   next();
 });
 
 app.use('/users', userRouter);
-app.use('/', cardRouter);
+app.use('/cards', cardRouter);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
