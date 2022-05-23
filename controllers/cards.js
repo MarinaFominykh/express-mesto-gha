@@ -7,32 +7,15 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  let data = '';
-  req.on('data', (chunk) => {
-    data += chunk.toString();
-  });
-  req.on('end', () => {
-    const { name, link } = JSON.parse(data);
-    console.log(name, link);
-    const owner = req.user._id;
-    if (!name || !link) {
-      res.status(400).send({ message: 'Переданы некорректные данные' });
-      return;
-    }
-    Card.create({ name, link, owner })
-      .then((card) => res.send({ data: card }))
-      .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-  });
-
-  // const { name, link } = req.body;
-  // const owner = req.user._id;
-  // if (!name || !link) {
-  //   res.status(400).send({ message: 'Переданы некорректные данные' });
-  //   return;
-  // }
-  // Card.create({ name, link, owner })
-  //   .then((card) => res.send({ data: card }))
-  //   .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  if (!name || !link) {
+    res.status(400).send({ message: 'Переданы некорректные данные' });
+    return;
+  }
+  Card.create({ name, link, owner })
+    .then((card) => res.send({ data: card }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const deleteCard = (req, res) => {
