@@ -1,20 +1,23 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/un-authorized-err');
+const InValidDataError = require('../errors/in-valid-data-err');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
+  // .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const owner = req.user;
   if (!name || !link) {
-    res.status(400).send({ message: 'Переданы некорректные данные' });
-    return;
+    throw InValidDataError('Переданы некорректные данные карточки');
   }
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(200).send({ data: card }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
@@ -24,21 +27,28 @@ const createCard = (req, res) => {
     });
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+const deleteCard = (req, res, next) => {
+  const owner = req.user;
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
-      res.send({ data: card });
+      return card.id;
     })
+    .then((cardId) => {
+      if (cardId !== owner) {
+        throw new ForbiddenError('Вы не можете удалять чужие карточки');
+      }
+      Card.findByIdAndRemove(req.params.id);
+    })
+    .then(() => res.status(200).send({ message: 'Карточка удалена' }))
     .catch((error) => {
       if (error.kind === 'ObjectId') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: 'Переданы некорректные данные карточки' });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(error);
     });
 };
 
