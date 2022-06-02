@@ -28,16 +28,16 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const owner = req.user;
+  const owner = req.user._id;
   Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
-      return card.id;
+      return card;
     })
-    .then((cardId) => {
-      if (cardId !== owner) {
+    .then((card) => {
+      if (String(card.owner) !== owner) {
         throw new ForbiddenError('Вы не можете удалять чужие карточки');
       }
       Card.findByIdAndRemove(req.params.id);
