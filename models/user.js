@@ -3,7 +3,6 @@ const validator = require('validator');
 
 const mongoose = require('mongoose');
 
-const UnauthorizedError = require('../errors/un-authorized-err');
 const InValidDataError = require('../errors/in-valid-data-err');
 
 const userSchema = new mongoose.Schema({
@@ -61,7 +60,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnauthorizedError('Необходима авторизация');
+            throw new InValidDataError('Почта или пароль введены неправильно');
           }
 
           return user;
