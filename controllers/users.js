@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
-// const UnauthorizedError = require('../errors/un-authorized-err');
 const InValidDataError = require('../errors/in-valid-data-err');
 // const EmailDuplicateError = require('../errors/email-duplicate-err');
 // const { hash } = require('bcrypt');
@@ -44,8 +43,8 @@ const createUser = (req, res, next) => {
       User.create({
         name, about, avatar, email, password: hash,
       })
-        .then((newUser) => {
-          res.status(200).send({ data: newUser });
+        .then(() => {
+          res.status(200).send({ message: 'Пользователь успешно создан' });
         })
         .catch((err) => {
           if (err.code === 11000) {
