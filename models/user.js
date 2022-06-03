@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 
-const UnauthorizedError = require('../errors/in-valid-data-err');
+const UnauthorizedError = require('../errors/un-authorized-err');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
 
   about: {
     type: String,
-    default: 'исследователь океана',
+    default: 'Исследователь',
     minlength: 2,
     maxlength: 30,
   },
@@ -46,7 +46,6 @@ userSchema.statics.findUserByCredentials = function (email, password) {
           if (!matched) {
             throw new UnauthorizedError('Необходима авторизация');
           }
-
           return user;
         });
     });

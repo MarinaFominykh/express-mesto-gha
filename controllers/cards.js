@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const ForbiddenError = require('../errors/un-authorized-err');
+const ForbiddenError = require('../errors/forbidden-err');
 const InValidDataError = require('../errors/in-valid-data-err');
 
 const getCards = (req, res, next) => {
