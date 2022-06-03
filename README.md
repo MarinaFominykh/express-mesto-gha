@@ -51,10 +51,3 @@
 ## Ссылка на проект
 https://github.com/MarinaFominykh/express-mesto-gha
 
-{
-"name": "Джек Лондон",
-"about": "писатель",
-"avatar": "https://i.pinimg.com/736x/af/55/21/af55215135fdefe508905fdbf0f56438.jpg",
-"email": "london@ya.ru",
-"password": "123456789"
-}

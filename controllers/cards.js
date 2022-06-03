@@ -7,7 +7,6 @@ const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
     .catch(next);
-  // .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const createCard = (req, res) => {
@@ -37,10 +36,10 @@ const deleteCard = (req, res, next) => {
       return card;
     })
     .then((card) => {
-      if (String(card.owner) !== owner) {
-        throw new ForbiddenError('Вы не можете удалять чужие карточки');
+      if (String(card.owner) === owner) {
+        return Card.findByIdAndRemove(req.params.id);
       }
-      Card.findByIdAndRemove(req.params.id);
+      throw new ForbiddenError('Вы не можете удалять чужие карточки');
     })
     .then(() => res.status(200).send({ message: 'Карточка удалена' }))
     .catch((error) => {
