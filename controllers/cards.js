@@ -9,7 +9,7 @@ const getCards = (req, res, next) => {
     .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user;
   if (!name || !link) {
@@ -17,12 +17,13 @@ const createCard = (req, res) => {
   }
   Card.create({ name, link, owner })
     .then((card) => res.status(200).send({ data: card }))
+    // eslint-disable-next-line consistent-return
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-        return;
+        const inValidDataError = new InValidDataError('Переданы некорректные данные');
+        return next(inValidDataError);
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(error);
     });
 };
 
@@ -42,16 +43,17 @@ const deleteCard = (req, res, next) => {
       throw new ForbiddenError('Вы не можете удалять чужие карточки');
     })
     .then(() => res.status(200).send({ message: 'Карточка удалена' }))
+    // eslint-disable-next-line consistent-return
     .catch((error) => {
       if (error.kind === 'ObjectId') {
-        res.status(400).send({ message: 'Переданы некорректные данные карточки' });
-        return;
+        const inValidDataError = new InValidDataError('Переданы некорректные данные');
+        return next(inValidDataError);
       }
       next(error);
     });
 };
 
-const likecard = (req, res) => {
+const likecard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -59,21 +61,21 @@ const likecard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
       res.send({ data: card });
     })
+    // eslint-disable-next-line consistent-return
     .catch((error) => {
       if (error.kind === 'ObjectId') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-        return;
+        const inValidDataError = new InValidDataError('Переданы некорректные данные');
+        return next(inValidDataError);
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(error);
     });
 };
 
-const disLikecard = (req, res) => {
+const disLikecard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
@@ -81,17 +83,17 @@ const disLikecard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
       res.send({ data: card });
     })
+    // eslint-disable-next-line consistent-return
     .catch((error) => {
       if (error.kind === 'ObjectId') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-        return;
+        const inValidDataError = new InValidDataError('Переданы некорректные данные');
+        return next(inValidDataError);
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      next(error);
     });
 };
 

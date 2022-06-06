@@ -17,6 +17,7 @@ const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login, getCurrentUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -40,8 +41,8 @@ app.get('/users/me', getCurrentUser);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемая страница не найдена' });
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемая страница не найдена');
 });
 
 app.use(errors());
